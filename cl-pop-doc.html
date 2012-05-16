@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+  
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+
+  
+  
+  <title>cl-pop</title>
+</head>
+
+
+<body>
+
+
+<big><big>Cl-Pop&nbsp;</big></big><big><big>Ver 0.2.0</big></big><br>
+
+<br>
+
+<big><big>Introduction</big></big> <br>
+
+<br>
+
+<small>Cl-pop is designed to be an opensource portable common lisp
+pop-client based for RFC 1939. It has two interface levels. The first
+is a higher level interface useful for common functions needed to
+process the email messages. The second is an interface to the standard
+pop function calls as defined by RFC 1939.&nbsp;</small> <br>
+
+<p>
+<small>Version 0.2.0 broke the dependency on cl-smtp and switched to usocket for establishing
+the socket connections to the pop server. Note this change also effected the internal pop-connection class structure.</small>
+</p>
+
+<big><big>Dependencies </big></big><br>
+
+<br>
+
+
+<small>Cl-pop uses the following packages which are available from Clike.net</small><br>
+
+
+<ol>
+  <li><small>USOCKET - used to establish the socket connection for the different lisp environments&nbsp;</small></li>
+   <ol><li>Split-Sequence - used by usocket</li></ol>
+  <li><small>CL-PPCRE - for parsing the return strings from the pop server</small></li>
+</ol>
+
+<big><big> Installation </big></big><br>
+<small> A asdf system definition is provided to install the package</small><br> <br>
+
+<big><big>Supported Lisp Compilers<br>
+
+<small><small>Cl-pop should work in every lisp environment that Usocket supports although it has only been testing in Lispworks, Allegro and SBCL. <br>
+
+</small></small></big></big>
+<ol>
+  <li>Allegro Common Lisp</li>
+  <li>ArmedBear (post feb 11th, 2006 versions)</li>
+  <li>Clisp</li>
+  <li>CMUCL</li>
+  <li>ECL</li> 
+  <li>Lispworks</li>
+  <li>OpenMCL</li>
+  <li>SBCL</li>
+  <li>Scieneer Common Lisp</li> 
+</ol>
+
+If you wish to port cl-pop to another platform, it should be as simple
+as defining the functions make-smtp-socket and socket-stream to be
+compatible with your chosen platform, (see existing examples in the
+CL-SMTP system) as the core to cl-pop is written in ANSI compatible
+Common Lisp and the package CL-PPCRE supports many more plateforms. <br>
+<br>
+<big><big>
+Documentation</big></big><br>
+
+
+<br>
+
+
+<big>Mailbox Functions</big><br>
+
+
+<br>
+
+
+<big>open-pop-connection&nbsp;<small><span style="font-style: italic;">&amp;key host (port 110) username password ==&gt; Pop Connection Instance</span></small><br>
+
+
+</big>
+<div style="margin-left: 40px;"><big><small><small>Establishes a
+connection to a pop server using the connection parameters. Returns an
+instance of the class pop-connection which will be used by the later
+functions to communicate with the server.</small><br>
+
+
+</small></big></div>
+
+
+<br>
+
+
+<big>close-pop-connection <small><span style="font-style: italic;">pop-connection-instance</span></small><br>
+
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;<small> <small>Closes the connection with the pop server and closes the lisp socket</small><br>
+
+
+<br>
+
+
+</small>with-pop-connection <small><span style="font-style: italic;">(conn-var &amp;rest args) &amp;body body <br>
+
+
+</span></small></big>
+<div style="margin-left: 40px;"><small>Establishes an open connection
+to the server, args should be the same as open-pop-connection. On
+exiting the connection will be closed</small><br>
+
+
+</div>
+
+
+<br>
+
+
+<big>message-count <small><span style="font-style: italic;">pop-connection-instance ==&gt; integer<br>
+
+
+</span></small></big>
+<div style="margin-left: 40px;"><small>Number of messages currently in the pop mailbox.</small><br>
+
+
+</div>
+
+
+<br>
+
+
+<big>save-message <small><span style="font-style: italic;">pop-connection-instance<small> <big>message-num local-pathname<br>
+
+
+</big></small></span></small></big>
+<div style="margin-left: 40px;"><small>Saves email message with cooresponding message number to the file designated by pathname. The message includes the headers</small><big><br>
+
+
+</big></div>
+
+
+<big><br>
+
+
+message-headers <span style="font-style: italic;"><small>pop-connection-instance message-num ==&gt; assoc-list</small><br>
+
+
+</span></big>
+<div style="margin-left: 40px;"><small>Returns an assoc list of the
+email headers, if duplicate or multiline headers are present, they will
+be appended togther to form one associated pair</small><br>
+
+
+</div>
+
+
+<br>
+
+
+<big>retrieve-pop-message <small><span style="font-style: italic;">pop-connection-instance message-num &amp;key (max-size) ==&gt; plist</span><br>
+
+
+</small></big>
+<div style="margin-left: 40px;"><small>Returns an assoc list of the
+email headers, if duplicate or multiline headers are present, they will
+be appended togther to form one associated pair</small><br>
+
+
+</div>
+
+
+<big><br>
+
+delete-pop-message <small><span style="font-style: italic;">pop-connection-instance message-num<br>
+
+
+</span></small></big>
+<div style="margin-left: 40px;"><small>Marked given message number for deletion. Deletion does not happen until the connection is closed.</small><big><br>
+
+
+</big></div>
+
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+
+<big><big>Standard Pop Functions</big></big><br>
+
+<div style="margin-left: 40px;">The following are the basic pop
+functions as described by the RFC. The functions take the form
+send-pop-&lt;rfc function name&gt;. Typically one will use the above
+functions instead, but these would be helpful if one wishes to write
+their own higher level routines. </div>
+
+<br>
+
+<big>send-pop-stat <span style="font-style: italic;">pop-connecion-instance =&gt; list of integers</span><br>
+
+</big>
+<div style="margin-left: 40px;"><small>Returns a list &nbsp;of
+integers. The first integer is the number of messages in the mailbox,
+the second is the combined size of the messages.</small></div>
+
+<big><br>
+
+send-pop-list <span style="font-style: italic;">pop-connection-instance &amp;optional message-num =&gt; List of lists<br>
+
+</span></big>
+<div style="margin-left: 40px;"><small>Returns a list of list of
+integers where each list contains the message number and the size of
+that message.It the message number is provided only the information on
+the message is returned otherwise all messages are returned.<br>
+
+</small></div>
+
+<br>
+
+<big>send-pop-dele</big> <span style="font-style: italic;">pop-connection-instance message-num =&gt; boolean<br>
+
+</span>
+<div style="margin-left: 40px;">Marks the message with the provided message number for deletion. Deletion does not occur until the QUIT command is issued.<br>
+
+</div>
+
+<br>
+
+<big>send-pop-rset <span style="font-style: italic;">pop-connection-instance =&gt; boolean<br>
+
+</span></big>
+<div style="margin-left: 40px;">Unmarks all previous message that were marked for deletion<br>
+
+</div>
+
+<br>
+
+<big>send-pop-uidl <span style="font-style: italic;">pop-connection-instance &amp;optional message-num =&gt; list of lists<br>
+
+</span></big>
+<div style="margin-left: 40px;"><small>Returns a list of lists giving
+the message number and the pop servers unique id for that message. If a
+message number is provided only the listing for that message is
+returned.<br>
+
+</small></div>
+
+<br>
+
+<big>send-pop-noop <span style="font-style: italic;">pop-connection-instance =&gt; boolean<br>
+
+</span></big>
+<div style="margin-left: 40px;"><em></em>No operation command. Useful for testing in the connection is still alive.<br>
+
+<br>
+
+</div>
+
+<big>send-pop-top <span style="font-style: italic;">pop-connection-instance message-num line-count =&gt; List of strings<br>
+
+</span></big>
+<div style="margin-left: 40px;"><small>Returns the message header and the first X number of lines of the message for the given message number.</small><br>
+
+</div>
+
+<br>
+
+<big>send-pop-retr <span style="font-style: italic;">pop-connection-instance message-num =&gt; list of strings<br>
+
+</span></big>
+<div style="margin-left: 40px;"><small>Returns a list of strings, where each string represents one line in the message.</small><br>
+
+</div>
+
+<br>
+
+<big>send-pop-quit <span style="font-style: italic;">pop-connection-instance =&gt; boolean<br>
+
+</span></big>
+<div style="margin-left: 40px;">Issues the pop quit command, which
+closes the connection to the pop server. At this point all messages
+marked for deletion will be deleted. </div>
+
+
+<br>
+
+<br>
+
+<big>Future Enhancement Items / Limitations<small><small><br>
+
+<br>
+
+</small></small></big>
+<ol>
+
+  <li>A full conditional system for signally non-terminal errors, currently these are simply written to standard-output</li>
+
+  <li>A reconnect feature to re-establish contact if the socket was unexpectedly closed.&nbsp;</li>
+
+  <li>Message parsing routines to surgically read different sections of a multi-part message.</li>
+
+</ol>
+
+<br>
+
+<big>Contributors</big><br>
+
+<br>
+
+Brian Sorg,&nbsp;brian.sorg@liberatinginsight.com<br>
+
+<br>
+
+<big> Bug Reports </big> <br>
+
+Report problems to Brian Sorg, brian.sorg@liberatinginsight.com <br>
+
+</body>
+</html>
